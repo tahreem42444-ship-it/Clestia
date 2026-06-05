@@ -2,10 +2,7 @@ import assert from "node:assert/strict";
 import { describe, test } from "node:test";
 
 import { getBirthstone } from "./birthstones.ts";
-import {
-  calculateCompatibility,
-  getCompatibilityForBirthDates,
-} from "./compatibility.ts";
+import { calculateCompatibility, getCompatibilityForBirthDates } from "./compatibility.ts";
 import { getDailyHoroscope } from "./horoscope.ts";
 import { getLuckyPair } from "./lucky.ts";
 import { ZODIAC } from "./zodiac.ts";
