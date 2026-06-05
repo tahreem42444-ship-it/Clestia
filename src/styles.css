@@ -1,0 +1,247 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-ivory: var(--ivory);
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 1rem;
+  /* Deep cosmic indigo/violet */
+  --background: oklch(0.16 0.05 280);
+  --foreground: oklch(0.96 0.01 80);
+  --card: oklch(0.22 0.06 280 / 60%);
+  --card-foreground: oklch(0.96 0.01 80);
+  --popover: oklch(0.2 0.06 280);
+  --popover-foreground: oklch(0.96 0.01 80);
+  --primary: oklch(0.82 0.13 85); /* warm gold */
+  --primary-foreground: oklch(0.18 0.05 280);
+  --secondary: oklch(0.28 0.06 280);
+  --secondary-foreground: oklch(0.96 0.01 80);
+  --muted: oklch(0.26 0.05 280);
+  --muted-foreground: oklch(0.72 0.03 80);
+  --accent: oklch(0.32 0.08 290);
+  --accent-foreground: oklch(0.96 0.01 80);
+  --destructive: oklch(0.7 0.18 25);
+  --destructive-foreground: oklch(0.98 0.01 80);
+  --border: oklch(0.96 0.01 80 / 12%);
+  --input: oklch(0.96 0.01 80 / 14%);
+  --ring: oklch(0.82 0.13 85 / 60%);
+
+  --gold: oklch(0.82 0.13 85);
+  --gold-soft: oklch(0.88 0.08 85);
+  --ivory: oklch(0.96 0.02 80);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html,
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+  body {
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(ellipse at 20% 10%, oklch(0.32 0.12 290 / 0.5), transparent 60%),
+      radial-gradient(ellipse at 80% 90%, oklch(0.28 0.14 320 / 0.45), transparent 60%),
+      linear-gradient(180deg, oklch(0.14 0.05 280), oklch(0.1 0.04 275));
+    background-attachment: scroll;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: linear-gradient(180deg, oklch(1 0 0 / 0.08), oklch(1 0 0 / 0.03));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid oklch(1 0 0 / 0.08);
+  }
+  .star-field::before,
+  .star-field::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, oklch(0.96 0.02 80 / 0.34) 0 1px, transparent 1.4px),
+      radial-gradient(circle, oklch(0.82 0.13 85 / 0.24) 0 1px, transparent 1.5px);
+    background-position:
+      0 0,
+      52px 88px;
+    background-size:
+      190px 190px,
+      290px 290px;
+    opacity: 0.28;
+  }
+  .star-field::after {
+    transform: rotate(8deg) scale(1.08);
+    opacity: 0.16;
+  }
+  .text-gold {
+    color: var(--gold);
+  }
+  .gold-gradient {
+    background: linear-gradient(135deg, oklch(0.92 0.09 90), oklch(0.78 0.14 75));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glow-gold {
+    box-shadow:
+      0 0 0 1px oklch(0.82 0.13 85 / 0.3),
+      0 10px 24px -14px oklch(0.82 0.13 85 / 0.5);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.26;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.82;
+    transform: scale(1.12);
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  50% {
+    opacity: 0.75;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes symbol-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4) rotate(-20deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12) rotate(4deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+.animate-twinkle {
+  animation: twinkle 3.5s ease-in-out infinite;
+}
+.animate-spin-slow {
+  animation: spin-slow 80s linear infinite;
+}
+.animate-reveal-up {
+  animation: reveal-up 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.animate-symbol-pop {
+  animation: symbol-pop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+.animate-pulse-slow {
+  animation: pulse-slow 5s ease-in-out infinite;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.78;
+}
+
+@media (max-width: 640px) {
+  .glass {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .animate-float,
+  .animate-pulse-slow,
+  .animate-reveal-up,
+  .animate-spin-slow,
+  .animate-symbol-pop,
+  .animate-twinkle {
+    animation: none !important;
+  }
+}
