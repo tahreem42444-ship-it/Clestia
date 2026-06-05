@@ -53,7 +53,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
     refreshLists();
   };
 
-  const handleDeletedSaved = (id: string) => {
+  const handleDeletedSaved = (_id: string) => {
     refreshLists();
   };
 

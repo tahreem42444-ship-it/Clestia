@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { calculateCompatibility } from "@/lib/compatibility";
-import { parseBirthDateInput, MIN_BIRTH_DATE } from "@/lib/birth-date";
+import { parseBirthDateInput, MIN_BIRTH_DATE, toDateInputValue } from "@/lib/birth-date";
 import { getZodiacSign } from "@/lib/zodiac";
 import { addOrUpdateHistoryEntry } from "@/lib/storage";
 import { type CelestiaReport } from "@/lib/report";
@@ -16,6 +16,7 @@ export function CompatibilityChecker({
 }: CompatibilityCheckerProps) {
   const [partnerDob, setPartnerDob] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [maxBirthDate, setMaxBirthDate] = useState("");
   const [result, setResult] = useState<{
     lovePercent: number;
     friendshipPercent: number;
@@ -23,6 +24,10 @@ export function CompatibilityChecker({
     partnerSign: string;
     partnerSymbol: string;
   } | null>(null);
+
+  useEffect(() => {
+    setMaxBirthDate(toDateInputValue(new Date()));
+  }, []);
 
   function handleCheck(e: React.FormEvent) {
     e.preventDefault();
@@ -91,7 +96,7 @@ export function CompatibilityChecker({
             type="date"
             value={partnerDob}
             min={MIN_BIRTH_DATE}
-            max={new Date().toISOString().split("T")[0]}
+            max={maxBirthDate || undefined}
             aria-required="true"
             suppressHydrationWarning
             onChange={(e) => {

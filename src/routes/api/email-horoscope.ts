@@ -1,6 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Resend } from "resend";
 
+/** Escape special HTML characters to prevent injection in email bodies. */
+function escHtml(str: string): string {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export const Route = createFileRoute("/api/email-horoscope")({
   server: {
     handlers: {
@@ -93,24 +103,24 @@ This reading is for entertainment and self-reflection only. Thank you for using 
 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaea; border-radius: 8px; color: #333;">
   <h2 style="color: #6d28d9; text-align: center;">✦ Celestia ✦</h2>
   <hr style="border: 0; border-top: 1px solid #eaeaea;" />
-  <p>Hello <strong>${name}</strong>,</p>
+  <p>Hello <strong>${escHtml(name)}</strong>,</p>
   <p>Here is your personalized astrology report generated on <strong>${new Date(report.generatedAt).toLocaleDateString()}</strong>:</p>
   
   <div style="background-color: #f5f3ff; padding: 15px; border-radius: 8px; margin: 15px 0;">
-    <h3 style="margin-top: 0; color: #7c3aed;">Your Sign: ${report.zodiacName}</h3>
-    <p style="font-style: italic; color: #666;">${report.dateRange}</p>
-    <p><strong>Daily Forecast:</strong> ${report.dailyHoroscope}</p>
+    <h3 style="margin-top: 0; color: #7c3aed;">Your Sign: ${escHtml(report.zodiacName)}</h3>
+    <p style="font-style: italic; color: #666;">${escHtml(report.dateRange)}</p>
+    <p><strong>Daily Forecast:</strong> ${escHtml(report.dailyHoroscope)}</p>
   </div>
 
   <div style="margin: 15px 0;">
-    <p><strong>Lucky Color:</strong> ${report.luckyColor}</p>
-    <p><strong>Lucky Number:</strong> ${report.luckyNumber}</p>
+    <p><strong>Lucky Color:</strong> ${escHtml(report.luckyColor)}</p>
+    <p><strong>Lucky Number:</strong> ${escHtml(String(report.luckyNumber))}</p>
   </div>
 
   <div style="background-color: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eaeaea; margin: 15px 0;">
-    <h4 style="margin-top: 0;">Traditional Birthstone: ${report.birthstone}</h4>
-    <p><strong>Meaning:</strong> ${report.birthstoneMeaning}</p>
-    <p><strong>Benefits:</strong> ${report.birthstoneBenefits}</p>
+    <h4 style="margin-top: 0;">Traditional Birthstone: ${escHtml(report.birthstone)}</h4>
+    <p><strong>Meaning:</strong> ${escHtml(report.birthstoneMeaning)}</p>
+    <p><strong>Benefits:</strong> ${escHtml(report.birthstoneBenefits)}</p>
   </div>
 
   ${compatibilityHtml}
