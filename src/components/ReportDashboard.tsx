@@ -150,39 +150,45 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
           </div>
         </div>
 
-        {/* 3. Today's Sky / Real Transit Card */}
-        <TransitCard />
-
-        {/* 4. Lucky Metrics */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center border border-border/40">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Lucky Number
-            </span>
-            <span className="text-4xl font-display font-bold gold-gradient mt-1">
-              {report.luckyNumber}
-            </span>
-          </div>
-          <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center border border-border/40">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Lucky Color
-            </span>
-            <span className="text-lg font-semibold text-ivory mt-2">{report.luckyColor}</span>
-          </div>
+        {/* Left Column Group */}
+        <div className="flex flex-col gap-6 w-full">
+          {/* 3. Today's Sky / Real Transit Card */}
+          <TransitCard />
         </div>
 
-        {/* 5. Birthstone Card */}
-        <div className="glass rounded-2xl p-5 sm:p-6 space-y-3 border border-border/40">
-          <h3 className="font-display text-xl text-gold">
-            Your Birthstone: {report.birthstone.name}
-          </h3>
-          <div className="space-y-2 text-sm leading-relaxed">
-            <p>
-              <strong>Traditional Meaning:</strong> {report.birthstone.meaning}
-            </p>
-            <p className="text-xs text-foreground/80 italic">
-              <strong>Benefits:</strong> {report.birthstone.benefits}
-            </p>
+        {/* Right Column Group */}
+        <div className="flex flex-col gap-6 w-full">
+          {/* 4. Lucky Metrics */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center border border-border/40">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Lucky Number
+              </span>
+              <span className="text-4xl font-display font-bold gold-gradient mt-1">
+                {report.luckyNumber}
+              </span>
+            </div>
+            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center border border-border/40">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Lucky Color
+              </span>
+              <span className="text-lg font-semibold text-ivory mt-2">{report.luckyColor}</span>
+            </div>
+          </div>
+
+          {/* 5. Birthstone Card */}
+          <div className="glass rounded-2xl p-5 sm:p-6 space-y-3 border border-border/40">
+            <h3 className="font-display text-xl text-gold">
+              Your Birthstone: {report.birthstone.name}
+            </h3>
+            <div className="space-y-2 text-sm leading-relaxed">
+              <p>
+                <strong>Traditional Meaning:</strong> {report.birthstone.meaning}
+              </p>
+              <p className="text-xs text-foreground/80 italic">
+                <strong>Benefits:</strong> {report.birthstone.benefits}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -232,7 +238,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
         </div>
 
         {/* 7. Birth Location and Map */}
-        <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
+        <div className="md:col-span-2 glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
           <div>
             <h3 className="font-display text-xl text-gold">Birth Location & Mapping</h3>
           </div>
