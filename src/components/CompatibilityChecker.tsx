@@ -107,7 +107,7 @@ export function CompatibilityChecker({
   }
 
   return (
-    <div className="glass rounded-2xl p-5 sm:p-6 space-y-4">
+    <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
       <div>
         <h3 className="font-display text-xl text-gold">Zodiac Compatibility</h3>
         <p className="text-xs text-muted-foreground">
