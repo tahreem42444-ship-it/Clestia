@@ -3,7 +3,11 @@ import type { TransitReport } from "@/lib/astro-types";
 import { getCurrentTransitReport } from "@/lib/astronomy-engine";
 import { Sparkles, Moon, Sun, Clock } from "lucide-react";
 
-export function TransitCard() {
+type TransitCardProps = {
+  onTransitLoaded?: (transitReport: TransitReport) => void;
+};
+
+export function TransitCard({ onTransitLoaded }: TransitCardProps = {}) {
   const [transits, setTransits] = useState<TransitReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<boolean>(false);
@@ -20,6 +24,9 @@ export function TransitCard() {
         const data = await response.json();
         if (data.ok && active) {
           setTransits(data.transits);
+          if (onTransitLoaded) {
+            onTransitLoaded(data.transits);
+          }
         } else {
           throw new Error("API returned ok: false");
         }
@@ -37,6 +44,9 @@ export function TransitCard() {
 
             fallbackReport.source = "fallback";
             setTransits(fallbackReport);
+            if (onTransitLoaded) {
+              onTransitLoaded(fallbackReport);
+            }
           } catch (fallbackErr) {
             console.error("Fallback failed:", fallbackErr);
             setError(true);

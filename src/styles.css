@@ -287,3 +287,455 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     animation: none !important;
   }
 }
+
+/* Print utilities and styling definitions */
+.print-only {
+  display: none;
+}
+
+@media print {
+  /* Hide all screen elements */
+  body > *:not(.print-only),
+  #root > *:not(.print-only),
+  main > *:not(.print-only),
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Page format setup */
+  @page {
+    size: letter;
+    margin: 20mm;
+  }
+
+  /* Base typography and clean light backdrop for printing */
+  html,
+  body {
+    background: #fdfcf7 !important; /* warm ivory backdrop */
+    background-image: none !important;
+    color: #1a1a24 !important;
+    font-family: "Inter", sans-serif !important;
+    min-height: auto !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Report document spacing */
+  .print-report-container {
+    max-width: 100%;
+    margin: 0 auto;
+    color: #1a1a24 !important;
+  }
+
+  /* Header styles */
+  .print-header {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+  .print-brand {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 14pt;
+    letter-spacing: 0.25em;
+    color: #8c733f !important;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .print-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 22pt;
+    font-weight: 700;
+    color: #1b1b26;
+    margin-top: 0;
+    margin-bottom: 6px;
+  }
+
+  .print-meta-date {
+    font-size: 8.5pt;
+    color: #555566 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .print-divider {
+    height: 1px;
+    background-color: #dcd5c2;
+    margin: 15px 0 20px 0;
+  }
+
+  /* Section styles */
+  .print-section {
+    margin-bottom: 25px;
+    page-break-inside: avoid;
+  }
+
+  .print-section-title {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 15pt;
+    font-weight: 700;
+    color: #8c733f !important;
+    border-bottom: 1px solid #e6dec9;
+    padding-bottom: 4px;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  .print-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid #e6dec9;
+    padding-bottom: 4px;
+    margin-bottom: 12px;
+  }
+
+  .print-section-header .print-section-title {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .print-source-label {
+    font-size: 8pt;
+    color: #666677;
+    font-style: italic;
+  }
+
+  /* Profile layout */
+  .print-profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background-color: #f7f6f0;
+    border: 1px solid #e6dec9;
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .print-profile-item {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .print-span-all {
+    grid-column: span 2;
+  }
+
+  .print-label {
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #666677;
+    letter-spacing: 0.08em;
+    margin-bottom: 1px;
+  }
+
+  .print-value {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1a1a24;
+  }
+
+  .print-sub-value {
+    font-size: 8.5pt;
+    color: #666677;
+  }
+
+  /* Forecast */
+  .print-forecast-text {
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #2a2a35;
+    text-align: justify;
+  }
+
+  /* Transits grid */
+  .print-transits-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .print-transit-cell {
+    background-color: #fdfdfb;
+    border: 1px solid #e6dec9;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .print-transit-summary {
+    font-size: 10pt;
+    color: #333344;
+    line-height: 1.5;
+    background-color: #fbfaf6;
+    border-left: 3px solid #8c733f;
+    padding: 8px 12px;
+    margin: 8px 0 0 0;
+  }
+
+  /* Columns layout for Lucky metrics & birthstone */
+  .print-columns-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    page-break-inside: avoid;
+  }
+
+  .print-lucky-box,
+  .print-stone-box {
+    border: 1px solid #e6dec9;
+    background-color: #fdfdfb;
+    border-radius: 8px;
+    padding: 14px;
+    box-sizing: border-box;
+  }
+
+  .print-lucky-box {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .print-lucky-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .print-lucky-val {
+    font-size: 26pt;
+    font-weight: bold;
+    color: #8c733f;
+    line-height: 1;
+    margin-top: 4px;
+  }
+
+  .print-lucky-color-name {
+    font-size: 11pt;
+    font-weight: 600;
+    color: #1a1a24;
+    margin-top: 6px;
+  }
+
+  .print-stone-meaning,
+  .print-stone-benefits {
+    font-size: 9.5pt;
+    margin: 4px 0;
+    line-height: 1.45;
+  }
+
+  /* Advanced natal chart styles */
+  .print-natal-meta {
+    font-size: 10pt;
+    margin-bottom: 10px;
+  }
+
+  .print-natal-planets {
+    margin-top: 10px;
+  }
+
+  .print-natal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .print-natal-item {
+    display: flex;
+    justify-content: space-between;
+    background-color: #fdfdfb;
+    border: 1px solid #e6dec9;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 9.5pt;
+  }
+
+  .print-planet-name {
+    font-weight: 700;
+    color: #1a1a24;
+  }
+
+  .print-retrograde {
+    color: #c94c3c;
+    font-weight: 700;
+  }
+
+  .print-planet-position {
+    font-family: monospace;
+    font-size: 9pt;
+    color: #444455;
+  }
+
+  .print-fallback-note {
+    font-size: 8.5pt;
+    color: #666677;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: #fdfbf7;
+    border: 1px dashed #dcd5c2;
+    border-radius: 6px;
+  }
+
+  /* Zodiac Traits & Profile */
+  .print-zodiac-properties {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .print-zodiac-prop {
+    background-color: #fdfdfb;
+    border: 1px solid #e6dec9;
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .print-traits-box {
+    margin-top: 10px;
+  }
+
+  .print-traits-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .print-trait-tag {
+    border: 1px solid #d1c8b2;
+    background-color: #fbfaf6;
+    color: #705e35;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 8.5pt;
+    font-weight: 500;
+  }
+
+  /* Compatibility */
+  .print-compatibility-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9.5pt;
+    margin-bottom: 12px;
+    background-color: #fdfdfb;
+    border: 1px solid #e6dec9;
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+
+  .print-harmony-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 15px;
+  }
+
+  .print-harmony-score {
+    background-color: #fdfdfb;
+    border: 1px solid #e6dec9;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .print-harmony-percent {
+    display: block;
+    font-size: 20pt;
+    font-weight: bold;
+    font-family: "Cormorant Garamond", Georgia, serif;
+    margin-top: 4px;
+  }
+
+  .print-harmony-percent.love {
+    color: #b53d52;
+  }
+
+  .print-harmony-percent.friendship {
+    color: #2c6e91;
+  }
+
+  .print-compatibility-details {
+    border: 1px solid #e6dec9;
+    background-color: #fbfaf6;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 9.5pt;
+  }
+
+  .print-comp-detail-item {
+    margin-bottom: 8px;
+  }
+
+  .print-comp-detail-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .print-comp-detail-item.border-top {
+    border-top: 1px solid #e6dec9;
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+
+  .print-comp-label {
+    font-weight: bold;
+    font-size: 8pt;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .print-comp-label.text-gold {
+    color: #8c733f;
+  }
+
+  .print-comp-label.text-rose {
+    color: #b53d52;
+  }
+
+  .print-comp-label.text-sky {
+    color: #2c6e91;
+  }
+
+  /* Page breaks helper */
+  .page-break-before {
+    page-break-before: always;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+
+  /* Footers */
+  .print-footer {
+    border-top: 1px solid #dcd5c2;
+    margin-top: 30px;
+    padding-top: 15px;
+    text-align: center;
+  }
+
+  .print-disclaimer {
+    font-size: 8pt;
+    color: #666677;
+    font-style: italic;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+
+  .print-brand-sub {
+    font-family: "Cormorant Garamond", Georgia, serif;
+    font-size: 11pt;
+    letter-spacing: 0.12em;
+    color: #8c733f;
+  }
+}

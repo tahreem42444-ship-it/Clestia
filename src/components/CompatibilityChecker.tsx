@@ -9,11 +9,13 @@ import { CustomDatePicker } from "./CustomDatePicker";
 type CompatibilityCheckerProps = {
   currentReport: CelestiaReport;
   onUpdateHistory: () => void;
+  onUpdateReport?: (report: CelestiaReport) => void;
 };
 
 export function CompatibilityChecker({
   currentReport,
   onUpdateHistory,
+  onUpdateReport,
 }: CompatibilityCheckerProps) {
   const [partnerDob, setPartnerDob] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +106,9 @@ export function CompatibilityChecker({
 
     addOrUpdateHistoryEntry(updatedReport);
     onUpdateHistory();
+    if (onUpdateReport) {
+      onUpdateReport(updatedReport);
+    }
   }
 
   return (

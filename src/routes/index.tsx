@@ -13,7 +13,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Generate your personal sun sign report. Discover daily horoscopes, lucky metrics, birthstone meanings, compatibility checkers, and email your report.",
+          "Generate your personal sun sign report. Discover daily horoscopes, lucky metrics, birthstone meanings, compatibility checkers, and export your report as a PDF.",
       },
       { property: "og:title", content: "Celestia — Personal Horoscope Report" },
       {

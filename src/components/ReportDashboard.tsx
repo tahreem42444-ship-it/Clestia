@@ -6,8 +6,10 @@ import { ThemeToggle } from "./ThemeToggle.tsx";
 import { CompatibilityChecker } from "./CompatibilityChecker.tsx";
 import { HistoryPanel } from "./HistoryPanel.tsx";
 import { SavedReportsPanel } from "./SavedReportsPanel.tsx";
-import { EmailReportForm } from "./EmailReportForm.tsx";
+import { ExportPdfReport } from "./ExportPdfReport.tsx";
+import { PrintableReport } from "./PrintableReport.tsx";
 import { BlogSection } from "./BlogSection.tsx";
+import type { TransitReport } from "@/lib/astro-types.ts";
 import { TransitCard } from "./TransitCard.tsx";
 import { AdvancedAstrologyCard } from "./AdvancedAstrologyCard.tsx";
 import { BirthLocationMap } from "./BirthLocationMap.tsx";
@@ -23,6 +25,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
   const [history, setHistory] = useState<CelestiaReport[]>([]);
   const [savedReports, setSavedReports] = useState<CelestiaReport[]>([]);
   const [isSaved, setIsSaved] = useState(false);
+  const [transitReport, setTransitReport] = useState<TransitReport | null>(null);
 
   const refreshLists = useCallback(() => {
     const hist = getHistory();
@@ -153,7 +156,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
         {/* Left Column Group */}
         <div className="flex flex-col gap-6 w-full">
           {/* 3. Today's Sky / Real Transit Card */}
-          <TransitCard />
+          <TransitCard onTransitLoaded={setTransitReport} />
         </div>
 
         {/* Right Column Group */}
@@ -237,8 +240,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
           </div>
         </div>
 
-        {/* Zodiac Compatibility */}
-        <CompatibilityChecker currentReport={report} onUpdateHistory={refreshLists} />
+        {/* CompatibilityChecker moved to bottom utilities */}
 
         {/* 7. Birth Location and Map */}
         <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
@@ -283,13 +285,16 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
 
       {/* 10. Bottom Utilities */}
       <div className="grid gap-6 md:grid-cols-2 pt-6 border-t border-border/20">
-        <div className="md:col-span-2 max-w-2xl mx-auto w-full">
-          {/* Email Report Form */}
-          <EmailReportForm report={report} />
-        </div>
-      </div>
+        {/* Zodiac Compatibility */}
+        <CompatibilityChecker
+          currentReport={report}
+          onUpdateHistory={refreshLists}
+          onUpdateReport={onUpdateReport}
+        />
 
-      <div className="grid gap-6 md:grid-cols-2">
+        {/* Export PDF Report */}
+        <ExportPdfReport report={report} />
+
         {/* Saved Reports Panel */}
         <SavedReportsPanel
           savedReports={savedReports}
@@ -313,11 +318,17 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
           </h4>
           <p className="text-xs text-muted-foreground leading-relaxed">
             This reading is generated from astronomical alignments and your profile inputs. Your
-            data stays locally in this browser. Email delivery only sends the current report when
-            requested. This is for self-reflection and entertainment, not professional advice.
+            data stays locally in this browser. You can save or print your report locally using the
+            Export PDF utility. This is for self-reflection and entertainment, not professional
+            advice.
           </p>
         </div>
       </section>
+
+      {/* Printable version for window.print() */}
+      <div className="print-only">
+        <PrintableReport report={report} transitReport={transitReport} />
+      </div>
     </div>
   );
 }
