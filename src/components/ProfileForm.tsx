@@ -9,6 +9,9 @@ import { getProfile, saveProfile } from "@/lib/storage";
 import { type CelestiaProfile } from "@/lib/report";
 import { ConstellationRing } from "./ConstellationRing";
 import { CustomDateTimePicker } from "./CustomDateTimePicker";
+import { BirthLocationPicker } from "./BirthLocationPicker";
+import { BirthLocationMap } from "./BirthLocationMap";
+import type { BirthLocation } from "@/lib/astro-types";
 
 type ProfileFormProps = {
   onSubmitSuccess: (profile: CelestiaProfile) => void;
@@ -18,6 +21,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
   const [birthTime, setBirthTime] = useState<string | undefined>(undefined);
+  const [birthLocation, setBirthLocation] = useState<BirthLocation | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [maxBirthDate, setMaxBirthDate] = useState("");
 
@@ -28,6 +32,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
       setName(existing.name);
       setDob(existing.birthDate);
       setBirthTime(existing.birthTime);
+      setBirthLocation(existing.birthLocation);
     }
   }, []);
 
@@ -60,6 +65,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
       name: trimmedName,
       birthDate: validation.value,
       birthTime,
+      birthLocation,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -69,7 +75,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col justify-center py-6 sm:py-8">
+    <div className="flex flex-1 flex-col justify-center py-6 sm:py-8 animate-fade-in">
       <section className="flex flex-col items-center text-center">
         <div className="relative h-44 w-44 sm:h-56 sm:w-56 md:h-60 md:w-60">
           <ConstellationRing className="absolute inset-0" />
@@ -84,7 +90,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
       </section>
 
       <section className="mt-6 mx-auto w-full max-w-md">
-        <form onSubmit={handleSubmit} className="glass rounded-2xl p-5 sm:p-6" noValidate>
+        <form onSubmit={handleSubmit} className="glass rounded-2xl p-5 sm:p-6 space-y-4" noValidate>
           <div className="space-y-4">
             <div>
               <label
@@ -125,6 +131,23 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
               minDate={MIN_BIRTH_DATE}
               maxDate={maxBirthDate || undefined}
             />
+
+            <BirthLocationPicker
+              value={birthLocation}
+              onChange={(loc) => {
+                setBirthLocation(loc);
+                if (error) setError(null);
+              }}
+            />
+
+            <BirthLocationMap location={birthLocation} />
+
+            {!birthLocation && (
+              <p className="text-[10px] text-muted-foreground italic bg-gold/5 border border-gold/10 rounded-lg p-2">
+                ℹ️ Birth location improves chart accuracy, but your report can still be generated
+                without it.
+              </p>
+            )}
           </div>
 
           {error && (

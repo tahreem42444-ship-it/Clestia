@@ -28,6 +28,19 @@ export function EmailReportForm({ report }: EmailReportFormProps) {
     setSending(true);
 
     try {
+      const birthLocStr = report.profile.birthLocation
+        ? `${report.profile.birthLocation.name}${report.profile.birthLocation.admin1 ? ", " + report.profile.birthLocation.admin1 : ""}${report.profile.birthLocation.country ? ", " + report.profile.birthLocation.country : ""}`
+        : null;
+
+      const planetsStr = report.birthChartReport?.planets
+        ? report.birthChartReport.planets
+            .map(
+              (p) =>
+                `${p.planet}: ${p.sign} ${p.degreeInSign.toFixed(1)}°${p.retrograde ? " (Retrograde)" : ""}`,
+            )
+            .join("\n")
+        : null;
+
       const response = await fetch("/api/email-horoscope", {
         method: "POST",
         headers: {
@@ -49,6 +62,12 @@ export function EmailReportForm({ report }: EmailReportFormProps) {
               ? `Love Compatibility: ${report.compatibility.lovePercent}% | Friendship Compatibility: ${report.compatibility.friendshipPercent}% \nAdvice: ${report.compatibility.advice}`
               : null,
             generatedAt: report.generatedAt,
+            // Optional/New Fields
+            birthTime: report.profile.birthTime || null,
+            birthLocation: birthLocStr,
+            birthChartPlanets: planetsStr,
+            birthChartAscendant: report.birthChartReport?.ascendant || null,
+            birthChartSource: report.birthChartReport?.source || null,
           },
         }),
       });

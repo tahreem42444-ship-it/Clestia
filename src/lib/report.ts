@@ -3,11 +3,13 @@ import { getDailyHoroscope } from "./horoscope.ts";
 import { getLuckyPair } from "./lucky.ts";
 import { getBirthstone } from "./birthstones.ts";
 import { parseBirthDateInput } from "./birth-date.ts";
+import type { BirthLocation, TransitReport, BirthChartReport } from "./astro-types.ts";
 
 export type CelestiaProfile = {
   name: string;
   birthDate: string;
   birthTime?: string;
+  birthLocation?: BirthLocation;
   createdAt: string;
   updatedAt: string;
 };
@@ -44,6 +46,8 @@ export type CelestiaReport = {
     friction?: string;
     advice: string;
   };
+  transitReport?: TransitReport;
+  birthChartReport?: BirthChartReport;
 };
 
 export type CompatibilityReport = {
