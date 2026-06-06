@@ -10,33 +10,72 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiTransitsRouteImport } from './routes/api/transits'
+import { Route as ApiEmailHoroscopeRouteImport } from './routes/api/email-horoscope'
+import { Route as ApiAstroReportRouteImport } from './routes/api/astro-report'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTransitsRoute = ApiTransitsRouteImport.update({
+  id: '/api/transits',
+  path: '/api/transits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiEmailHoroscopeRoute = ApiEmailHoroscopeRouteImport.update({
+  id: '/api/email-horoscope',
+  path: '/api/email-horoscope',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAstroReportRoute = ApiAstroReportRouteImport.update({
+  id: '/api/astro-report',
+  path: '/api/astro-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/astro-report': typeof ApiAstroReportRoute
+  '/api/email-horoscope': typeof ApiEmailHoroscopeRoute
+  '/api/transits': typeof ApiTransitsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/astro-report': typeof ApiAstroReportRoute
+  '/api/email-horoscope': typeof ApiEmailHoroscopeRoute
+  '/api/transits': typeof ApiTransitsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/astro-report': typeof ApiAstroReportRoute
+  '/api/email-horoscope': typeof ApiEmailHoroscopeRoute
+  '/api/transits': typeof ApiTransitsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/astro-report'
+    | '/api/email-horoscope'
+    | '/api/transits'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/api/astro-report' | '/api/email-horoscope' | '/api/transits'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/astro-report'
+    | '/api/email-horoscope'
+    | '/api/transits'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiAstroReportRoute: typeof ApiAstroReportRoute
+  ApiEmailHoroscopeRoute: typeof ApiEmailHoroscopeRoute
+  ApiTransitsRoute: typeof ApiTransitsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +87,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/transits': {
+      id: '/api/transits'
+      path: '/api/transits'
+      fullPath: '/api/transits'
+      preLoaderRoute: typeof ApiTransitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/email-horoscope': {
+      id: '/api/email-horoscope'
+      path: '/api/email-horoscope'
+      fullPath: '/api/email-horoscope'
+      preLoaderRoute: typeof ApiEmailHoroscopeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/astro-report': {
+      id: '/api/astro-report'
+      path: '/api/astro-report'
+      fullPath: '/api/astro-report'
+      preLoaderRoute: typeof ApiAstroReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiAstroReportRoute: ApiAstroReportRoute,
+  ApiEmailHoroscopeRoute: ApiEmailHoroscopeRoute,
+  ApiTransitsRoute: ApiTransitsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
