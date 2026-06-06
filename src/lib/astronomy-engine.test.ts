@@ -57,12 +57,34 @@ describe("astronomy-engine", () => {
     assert.ok(sun.degreeInSign >= 0 && sun.degreeInSign < 30);
   });
 
-  test("getCurrentTransitReport returns a non-empty forecast summary", () => {
+  test("getCurrentTransitReport returns ok usable data", () => {
     const report = getCurrentTransitReport(new Date());
-    assert.ok(report.summary);
-    assert.ok(report.summary.length > 20);
+    assert.ok(report);
     assert.strictEqual(report.source, "astronomy-engine");
+    assert.ok(report.generatedAt);
+
+    // Sun and Moon are present
     assert.ok(Array.isArray(report.planets));
+    const sun = report.planets.find((p) => p.planet === "Sun");
+    const moon = report.planets.find((p) => p.planet === "Moon");
+    assert.ok(sun, "Sun must be present");
+    assert.ok(moon, "Moon must be present");
+
+    // summary is non-empty
+    assert.ok(report.summary);
+    assert.ok(report.summary.trim().length > 0);
+
+    // moonPhase name is non-empty
+    assert.ok(report.moonPhase);
     assert.ok(report.moonPhase.name);
+    assert.ok(report.moonPhase.name.trim().length > 0);
+
+    // degreeInSign is between 0 and 30
+    for (const p of report.planets) {
+      assert.ok(
+        p.degreeInSign >= 0 && p.degreeInSign < 30,
+        `Planet ${p.planet} degreeInSign ${p.degreeInSign} should be in [0, 30)`,
+      );
+    }
   });
 });

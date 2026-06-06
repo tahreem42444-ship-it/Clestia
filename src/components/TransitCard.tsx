@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { TransitReport } from "@/lib/astro-types";
+import { getCurrentTransitReport } from "@/lib/astronomy-engine";
 import { Sparkles, Moon, Sun, Clock } from "lucide-react";
 
 export function TransitCard() {
@@ -20,11 +21,27 @@ export function TransitCard() {
         if (data.ok && active) {
           setTransits(data.transits);
         } else {
-          setError(true);
+          throw new Error("API returned ok: false");
         }
       } catch (err) {
         console.error(err);
-        if (active) setError(true);
+        if (active) {
+          try {
+            // Client-side fallback
+            const fallbackReport = getCurrentTransitReport();
+
+            const hasSun = fallbackReport.planets.some((p) => p.planet === "Sun");
+            const hasMoon = fallbackReport.planets.some((p) => p.planet === "Moon");
+
+            if (!hasSun || !hasMoon) throw new Error("Fallback missing required planets");
+
+            fallbackReport.source = "fallback";
+            setTransits(fallbackReport);
+          } catch (fallbackErr) {
+            console.error("Fallback failed:", fallbackErr);
+            setError(true);
+          }
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -48,10 +65,9 @@ export function TransitCard() {
 
   if (error || !transits) {
     return (
-      <div className="glass rounded-2xl p-5 sm:p-6 text-center space-y-2 border border-border/40 bg-destructive/5">
+      <div className="glass rounded-2xl p-5 sm:p-6 text-center border border-border/40">
         <p className="text-xs text-muted-foreground">
-          ⚠️ Today's planetary transits are temporarily unavailable, but your daily horoscope is
-          active.
+          Today's sky data could not be loaded. Your personal horoscope is still available.
         </p>
       </div>
     );
@@ -66,14 +82,16 @@ export function TransitCard() {
 
   return (
     <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 animate-reveal-up border border-border/40">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Moon size={18} className="text-gold" />
           <h3 className="font-display text-xl text-gold">Today's Sky & Transits</h3>
         </div>
-        <div className="flex items-center gap-1 text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
+        <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground uppercase tracking-widest font-mono">
           <Clock size={10} />
-          <span>Real-time</span>
+          <span>
+            {transits.source === "fallback" ? "Source: Local astronomy fallback" : "Real-time"}
+          </span>
         </div>
       </div>
 
@@ -110,11 +128,15 @@ export function TransitCard() {
         {/* Inner Planets */}
         <div className="rounded-xl border border-border/60 bg-[oklch(1_0_0/0.02)] p-3 text-center flex flex-col justify-center items-center">
           <span className="text-[9px] uppercase tracking-widest text-muted-foreground">
-            Inner Alignment
+            Inner Planets
           </span>
-          <span className="mt-1.5 text-xs font-semibold text-ivory">
-            Mars in {getPlanetSign("Mars")}
-          </span>
+          <div className="mt-1 flex flex-col gap-0.5 text-[10px] font-semibold text-ivory">
+            {getPlanetSign("Mercury") !== "Unknown" && (
+              <span>Mercury in {getPlanetSign("Mercury")}</span>
+            )}
+            {getPlanetSign("Venus") !== "Unknown" && <span>Venus in {getPlanetSign("Venus")}</span>}
+            {getPlanetSign("Mars") !== "Unknown" && <span>Mars in {getPlanetSign("Mars")}</span>}
+          </div>
         </div>
       </div>
 
