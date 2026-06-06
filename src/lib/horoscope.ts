@@ -10,7 +10,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
     focus: [
       "A quiet determination guides your morning, turning your attention toward unfinished tasks.",
       "You may feel a subtle urge to step forward and take the lead on a group project.",
-      "Today brings an invitation to pause and assess your current momentum.",
+      "Take a moment today to pause and see how far you've come.",
       "Your natural drive is present, though it finds its best outlet in structured effort.",
       "Conversations today may challenge you to explain your perspective more patiently.",
       "A focus on practical organization helps clarify your thoughts.",
@@ -34,7 +34,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
     caution: [
       "Guard against a tendency to respond too quickly when challenged.",
       "Avoid taking on more commitments than your schedule realistically allows.",
-      "Try not to let minor delays disrupt your peace of mind.",
+      "Take a breath before responding to any challenges today.",
       "Be mindful of pushing for answers before others are ready to respond.",
       "Avoid making assumptions about someone's intentions; ask directly instead.",
       "Guard against impatience when things take longer than expected.",
@@ -58,9 +58,9 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
   },
   taurus: {
     focus: [
-      "A slow, steady rhythm feels natural today, letting you focus on simple tasks.",
+      "A slower pace feels right today, perfect for tackling simple tasks.",
       "You might find comfort in sorting through your immediate surroundings and creating order.",
-      "Today highlights the value of physical stability and a grounded presence.",
+      "You'll find strength in just staying grounded and present today.",
       "Your attention shifts toward long-term security and practical planning.",
       "A quiet focus on refining existing work serves you better than seeking novelty.",
       "Connections with nature or sensory details bring a sense of calm.",
@@ -102,7 +102,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Nurturing your immediate environment helps nurture your mind.",
       "Adaptability and strength are not opposites; they support each other.",
       "Respecting your physical limits is a key part of self-care.",
-      "Quiet endurance is a quiet but powerful force.",
+      "Endurance is a quiet but powerful force.",
       "The foundations we build today support our choices tomorrow.",
     ],
   },
@@ -116,7 +116,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Connecting with colleagues brings a constructive exchange of viewpoints.",
       "Today favors quick research and gathering details on a topic of interest.",
       "A lighthearted mood makes it easier to navigate small daily challenges.",
-      "Your mind is active, seeking patterns and connections in what you read.",
+      "Your mind is sharp today, picking up on patterns others might miss.",
       "Today brings an invitation to share your ideas in a clear, collaborative way.",
     ],
     advice: [
@@ -129,7 +129,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Use visual sketches or notes to organize a complex task.",
       "Share a helpful reference or article with a peer who needs it.",
       "Practice saying no to additional tasks to protect your active projects.",
-      "Ground your intellectual curious steps in real, practical actions.",
+      "Let curiosity lead, but keep one foot on the ground. A practical choice will matter more than a clever one today.",
     ],
     caution: [
       "Guard against skimming the surface when a deeper look is required.",
@@ -229,7 +229,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Practice humility by listening carefully to constructive feedback.",
       "Express your gratitude to someone who supported you recently.",
       "Focus on the core message of your presentation or ideas.",
-      "Walk with a calm confidence that doesn't need external validation.",
+      "Walk with confidence; you don't need anyone else's approval today.",
     ],
     caution: [
       "Guard against a tendency to dominate discussions or decisions.",
@@ -238,7 +238,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Be mindful of overcommitting to make a positive impression.",
       "Avoid reacting defensively when alternatives are proposed.",
       "Guard against taking minor oversights as personal slights.",
-      "Try not to neglect quiet preparation in favor of active action.",
+      "Try not to skip preparation in the rush to take action.",
       "Resist the temptation to make grand gestures when simple ones work.",
       "Avoid ignoring the subtle details of a project in your excitement.",
       "Be careful not to exhaust your energy reserves in group activities.",
@@ -411,7 +411,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "An open, curious outlook helps you see the big picture today.",
       "A desire for fresh learning encourages you to research new topics.",
       "Today highlights the value of broad perspectives and honest sharing.",
-      "A focus on forward-looking ideas brings constructive enthusiasm.",
+      "Looking ahead brings a fresh spark of enthusiasm.",
       "You may feel a natural urge to explore creative options in work.",
       "Connections with peers are lighthearted, open, and conversational.",
       "Today favors planning general goals rather than parsing details.",
@@ -570,7 +570,7 @@ const HOROSCOPE_SEGMENTS: Record<string, HoroscopeSegments> = {
       "Today brings an invitation to protect and restore your inner quiet.",
     ],
     advice: [
-      "Dedicate a block of time to journaling or creative thinking today.",
+      "Set aside some time for journaling or creative thinking today.",
       "Check in on your energy levels and take quiet breaks when needed.",
       "Offer a listening ear to a colleague who needs quiet support.",
       "Set clear, kind boundaries to protect your focus from distraction.",

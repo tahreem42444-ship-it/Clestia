@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { BirthChartReport, PlanetPosition } from "@/lib/astro-types";
+import { getPlanetPositions, getMoonPhaseInfo } from "@/lib/astronomy-engine";
 
 // Helper to calculate timezone offset from string name (e.g. "Europe/London")
 function getTimezoneOffset(
@@ -76,12 +77,47 @@ export const Route = createFileRoute("/api/astro-report")({
 
           // 2. Check API key configuration
           const apiKey = process.env.FREE_ASTRO_API_KEY;
+
+          let dateObj = new Date(birthDate + "T12:00:00");
+          if (birthTime) {
+            const match = String(birthTime).match(/(\d+):(\d+)\s*(AM|PM)?/i);
+            if (match) {
+              let h = parseInt(match[1], 10);
+              const m = parseInt(match[2], 10);
+              const ampm = match[3];
+              if (ampm) {
+                if (ampm.toUpperCase() === "PM" && h < 12) h += 12;
+                if (ampm.toUpperCase() === "AM" && h === 12) h = 0;
+              }
+              dateObj = new Date(
+                birthDate + `T${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:00`,
+              );
+            }
+          }
+
+          const generateFallbackChart = (): BirthChartReport => {
+            const planets = getPlanetPositions(dateObj);
+            const moonPhase = getMoonPhaseInfo(dateObj);
+            const sunSign = planets.find((p) => p.planet === "Sun")?.sign;
+            const moonSign = planets.find((p) => p.planet === "Moon")?.sign;
+            return {
+              source: "astronomy-engine-lite",
+              planets,
+              sunSign,
+              moonSign,
+              moonPhase,
+            };
+          };
+
           if (!apiKey) {
             return new Response(
               JSON.stringify({
-                ok: false,
-                code: "FREE_ASTRO_NOT_CONFIGURED",
-                error: "Advanced astrology is not configured for this deployment.",
+                ok: true,
+                birthChart: generateFallbackChart(),
+                warning: {
+                  code: "FREE_ASTRO_NOT_CONFIGURED_USING_FALLBACK",
+                  message: "Advanced provider not configured. Fallback chart generated locally.",
+                },
               }),
               { status: 200, headers: { "Content-Type": "application/json" } },
             );
@@ -138,11 +174,14 @@ export const Route = createFileRoute("/api/astro-report")({
             console.error(`FreeAstroAPI request failed with status: ${apiResponse.status}`);
             return new Response(
               JSON.stringify({
-                ok: false,
-                code: "FREE_ASTRO_FAILED",
-                error: "Advanced astrology data is temporarily unavailable.",
+                ok: true,
+                birthChart: generateFallbackChart(),
+                warning: {
+                  code: "FREE_ASTRO_FAILED_USING_FALLBACK",
+                  message: "Advanced provider unavailable. Fallback chart generated locally.",
+                },
               }),
-              { status: 502, headers: { "Content-Type": "application/json" } },
+              { status: 200, headers: { "Content-Type": "application/json" } },
             );
           }
 
@@ -152,11 +191,14 @@ export const Route = createFileRoute("/api/astro-report")({
           if (!data || typeof data !== "object") {
             return new Response(
               JSON.stringify({
-                ok: false,
-                code: "FREE_ASTRO_FAILED",
-                error: "Advanced astrology data is temporarily unavailable.",
+                ok: true,
+                birthChart: generateFallbackChart(),
+                warning: {
+                  code: "FREE_ASTRO_FAILED_USING_FALLBACK",
+                  message: "Advanced provider unavailable. Fallback chart generated locally.",
+                },
               }),
-              { status: 502, headers: { "Content-Type": "application/json" } },
+              { status: 200, headers: { "Content-Type": "application/json" } },
             );
           }
 
@@ -217,14 +259,58 @@ export const Route = createFileRoute("/api/astro-report")({
           );
         } catch (error: unknown) {
           console.error("Failed to generate advanced astrology report:", error);
-          return new Response(
-            JSON.stringify({
-              ok: false,
-              code: "FREE_ASTRO_FAILED",
-              error: "Advanced astrology data is temporarily unavailable.",
-            }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+
+          try {
+            // Attempt to recover with fallback if FreeAstroAPI failed exceptionally
+            const { getPlanetPositions, getMoonPhaseInfo } = await import("@/lib/astronomy-engine");
+            let fallbackDateObj = new Date(); // Using current time as absolute fallback fallback
+            // Trying to use provided date again
+            const body = await request
+              .clone()
+              .json()
+              .catch(() => ({}));
+            if (body.birthDate) {
+              fallbackDateObj = new Date(body.birthDate + "T12:00:00");
+              if (body.birthTime) {
+                const [h, m] = body.birthTime.split(":");
+                fallbackDateObj = new Date(
+                  body.birthDate +
+                    `T${(h || "12").padStart(2, "0")}:${(m || "00").padStart(2, "0")}:00`,
+                );
+              }
+            }
+            const planets = getPlanetPositions(fallbackDateObj);
+            const moonPhase = getMoonPhaseInfo(fallbackDateObj);
+
+            return new Response(
+              JSON.stringify({
+                ok: true,
+                birthChart: {
+                  source: "astronomy-engine-lite",
+                  planets,
+                  sunSign: planets.find((p) => p.planet === "Sun")?.sign,
+                  moonSign: planets.find((p) => p.planet === "Moon")?.sign,
+                  moonPhase,
+                },
+                warning: {
+                  code: "FREE_ASTRO_FAILED_USING_FALLBACK",
+                  message: "Advanced provider unavailable. Fallback chart generated locally.",
+                },
+              }),
+              { status: 200, headers: { "Content-Type": "application/json" } },
+            );
+          } catch (fallbackError) {
+            console.error("Fallback generation also failed:", fallbackError);
+            return new Response(
+              JSON.stringify({
+                ok: false,
+                code: "ALL_SOURCES_FAILED",
+                error:
+                  "Advanced chart details are unavailable right now. Your daily report is still saved.",
+              }),
+              { status: 500, headers: { "Content-Type": "application/json" } },
+            );
+          }
         }
       },
     },

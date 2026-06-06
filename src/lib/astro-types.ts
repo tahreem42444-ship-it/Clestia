@@ -42,6 +42,8 @@ export type BirthChartReport = {
   moonSign?: string;
   sunSign?: string;
   planets?: PlanetPosition[];
+  moonPhase?: MoonPhaseInfo;
+  summary?: string;
   houses?: unknown;
   raw?: unknown;
   unavailableReason?: string;

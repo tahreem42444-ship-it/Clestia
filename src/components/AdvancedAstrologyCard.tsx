@@ -15,7 +15,7 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
   const [chart, setChart] = useState<BirthChartReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [statusMode, setStatusMode] = useState<
-    "idle" | "loading" | "success" | "not_configured" | "location_required" | "failed"
+    "idle" | "loading" | "success" | "time_required" | "location_required" | "failed"
   >("idle");
 
   useEffect(() => {
@@ -38,6 +38,11 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
   const generateChart = async () => {
     if (!profile.birthLocation) {
       setStatusMode("location_required");
+      return;
+    }
+
+    if (!profile.birthTime) {
+      setStatusMode("time_required");
       return;
     }
 
@@ -69,59 +74,19 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
         setStatusMode("success");
         saveChartToReport(data.birthChart);
       } else {
-        if (data.code === "FREE_ASTRO_NOT_CONFIGURED") {
-          setStatusMode("not_configured");
-        } else if (data.code === "BIRTH_LOCATION_REQUIRED") {
-          setStatusMode("location_required");
-        } else {
-          setError(data.error || "Failed to generate advanced astrology data.");
-          setStatusMode("failed");
-        }
+        setError(data.error || "Failed to generate advanced astrology data.");
+        setStatusMode("failed");
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "An unexpected error occurred.";
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Advanced chart details are unavailable right now. Your daily report is still saved.";
       setError(message);
       setStatusMode("failed");
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLocalCalculation = () => {
-    setLoading(true);
-    setStatusMode("loading");
-
-    setTimeout(async () => {
-      try {
-        const { getPlanetPositions } = await import("@/lib/astronomy-engine");
-
-        let dateObj = new Date(profile.birthDate + "T12:00:00");
-        if (profile.birthTime) {
-          const [h, m] = profile.birthTime.split(":");
-          dateObj = new Date(profile.birthDate + `T${h.padStart(2, "0")}:${m.padStart(2, "0")}:00`);
-        }
-
-        const planets = getPlanetPositions(dateObj);
-        const sunSign = planets.find((p) => p.planet === "Sun")?.sign;
-        const moonSign = planets.find((p) => p.planet === "Moon")?.sign;
-
-        const fallbackChart: BirthChartReport = {
-          source: "astronomy-engine-lite",
-          planets,
-          sunSign,
-          moonSign,
-        };
-
-        setChart(fallbackChart);
-        setStatusMode("success");
-        saveChartToReport(fallbackChart);
-      } catch (err) {
-        setError("Local calculations failed.");
-        setStatusMode("failed");
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
   };
 
   return (
@@ -137,7 +102,7 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
             Generate your advanced birth chart including planet positions computed for your precise
             time and location of birth.
           </p>
-          {profile.birthLocation ? (
+          {profile.birthLocation && profile.birthTime ? (
             <button
               onClick={generateChart}
               disabled={loading}
@@ -150,8 +115,11 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
               <p className="text-xs text-muted-foreground flex items-start gap-1.5">
                 <MapPin size={14} className="text-gold mt-0.5 shrink-0" />
                 <span>
-                  Birth location is required to calculate houses, ascendant and precise planet
-                  offsets.
+                  {!profile.birthLocation && !profile.birthTime
+                    ? "Birth location and time are required to calculate precise planet offsets."
+                    : !profile.birthLocation
+                      ? "Birth location is required to calculate precise planet offsets."
+                      : "Birth time is required to calculate precise planet offsets."}
                 </span>
               </p>
             </div>
@@ -167,53 +135,40 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
       )}
 
       {statusMode === "location_required" && (
-        <div className="rounded-xl border border-warning/40 bg-warning/5 p-3.5 space-y-2 text-xs text-warning-foreground">
+        <div className="rounded-xl border border-border bg-[oklch(1_0_0/0.02)] p-3.5 space-y-2 text-xs text-muted-foreground">
           <p className="font-semibold flex items-center gap-1.5 text-gold">
             <AlertCircle size={14} />
-            <span>Birth Location Needed</span>
+            <span>Add Birth Location</span>
           </p>
-          <p className="text-muted-foreground leading-relaxed">
-            Please edit your profile and provide a birth city to map your coordinates and calculate
-            the advanced chart.
+          <p className="leading-relaxed">
+            Add your birth location to unlock advanced chart details. Your basic report still works.
           </p>
         </div>
       )}
 
-      {statusMode === "not_configured" && (
-        <div className="space-y-3">
-          <div className="rounded-xl border border-border bg-[oklch(1_0_0/0.02)] p-3.5 text-xs text-muted-foreground">
-            <p className="mb-1 text-gold font-semibold">API Key Not Active</p>
-            <p className="leading-relaxed">
-              Advanced chart calculation is not enabled on this deployment yet. Your basic report
-              still works.
-            </p>
-          </div>
-          <button
-            onClick={handleLocalCalculation}
-            className="w-full text-xs font-semibold py-2 px-4 rounded-full border border-border text-gold hover:bg-[oklch(1_0_0/0.04)] transition-colors cursor-pointer"
-          >
-            Calculate Locally with Astronomy Engine
-          </button>
+      {statusMode === "time_required" && (
+        <div className="rounded-xl border border-border bg-[oklch(1_0_0/0.02)] p-3.5 space-y-2 text-xs text-muted-foreground">
+          <p className="font-semibold flex items-center gap-1.5 text-gold">
+            <AlertCircle size={14} />
+            <span>Add Birth Time</span>
+          </p>
+          <p className="leading-relaxed">
+            Add your birth time for a more complete chart. Your basic report still works.
+          </p>
         </div>
       )}
 
       {statusMode === "failed" && (
         <div className="space-y-3">
-          <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-3.5 text-xs text-destructive-foreground">
-            <p className="mb-1 font-semibold flex items-center gap-1">
+          <div className="rounded-xl border border-border bg-[oklch(1_0_0/0.02)] p-3.5 text-xs text-muted-foreground">
+            <p className="mb-1 font-semibold flex items-center gap-1 text-gold">
               <AlertCircle size={14} />
-              <span>Calculation Failed</span>
+              <span>Advanced Chart Unavailable</span>
             </p>
             <p className="text-muted-foreground">
-              {error || "Advanced astrology data is temporarily unavailable."}
+              Advanced chart details are unavailable right now. Your daily report is still saved.
             </p>
           </div>
-          <button
-            onClick={handleLocalCalculation}
-            className="w-full text-xs font-semibold py-2 px-4 rounded-full border border-border text-gold hover:bg-[oklch(1_0_0/0.04)] transition-colors cursor-pointer"
-          >
-            Run Offline Fallback Engine
-          </button>
         </div>
       )}
 
@@ -259,10 +214,13 @@ export function AdvancedAstrologyCard({ report, onUpdateReport }: AdvancedAstrol
           )}
 
           {chart.source === "astronomy-engine-lite" && (
-            <p className="text-[10px] text-muted-foreground italic leading-normal border-t border-border/20 pt-2">
-              Note: Houses and Ascendant data are omitted when calculated via the local offline
-              engine.
-            </p>
+            <div className="text-[10px] text-muted-foreground italic leading-normal border-t border-border/20 pt-2 space-y-1">
+              {chart.moonPhase && <p>Moon Phase: {chart.moonPhase.name}</p>}
+              <p>
+                Ascendant and houses require a full chart calculation. This fallback uses real
+                planetary positions but does not calculate houses.
+              </p>
+            </div>
           )}
         </div>
       )}

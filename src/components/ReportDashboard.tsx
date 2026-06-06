@@ -133,7 +133,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
       {/* Main Grid for Cards 2 to 8 */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 items-start">
         {/* 2. Daily Forecast */}
-        <div className="glass rounded-2xl p-5 sm:p-6 space-y-3 border border-border/40">
+        <div className="md:col-span-2 glass rounded-2xl p-5 sm:p-6 space-y-3 border border-border/40">
           <div className="flex items-center gap-2">
             <span className="text-gold">✨</span>
             <h3 className="font-display text-xl text-gold">Daily Forecast</h3>
@@ -187,7 +187,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
         </div>
 
         {/* 6. Zodiac Alignments / Traits */}
-        <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
+        <div className="md:col-span-2 glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
           <div>
             <h3 className="font-display text-lg text-gold">Zodiac Alignments</h3>
           </div>
