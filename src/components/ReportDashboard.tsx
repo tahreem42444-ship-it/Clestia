@@ -57,11 +57,16 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
     refreshLists();
   };
 
-  const formattedDob = new Date(report.profile.birthDate).toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const formattedDob = (() => {
+    const parts = report.profile.birthDate.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(Number.isNaN)) return report.profile.birthDate;
+    const [y, m, d] = parts;
+    return new Date(y, m - 1, d).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+  })();
 
   return (
     <div className="space-y-6">
@@ -112,7 +117,8 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
           </div>
           <p className="text-sm text-foreground/80 max-w-lg leading-relaxed">
             Your Western sun sign is <strong>{report.zodiac.name}</strong>, ruling the skies from{" "}
-            {report.zodiac.dateRange}. Born on {formattedDob}.
+            {report.zodiac.dateRange}. Born on {formattedDob}
+            {report.profile.birthTime ? ` at ${report.profile.birthTime}` : ""}.
           </p>
           <p className="text-xs text-muted-foreground italic leading-relaxed">
             {report.zodiac.description}
@@ -122,7 +128,7 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
 
       {/* Main Grid Section */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Left Column: Daily Horoscope and Lucky Card */}
+        {/* Left Column: Daily Horoscope, Zodiac traits, Compatibility, Email actions */}
         <div className="space-y-6">
           {/* Daily Horoscope Card */}
           <div className="glass rounded-2xl p-5 sm:p-6 space-y-3">
@@ -139,24 +145,6 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
                 day: "numeric",
                 year: "numeric",
               })}
-            </div>
-          </div>
-
-          {/* Lucky Color & Number & Traits Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Lucky Number
-              </span>
-              <span className="text-4xl font-display font-bold gold-gradient mt-1">
-                {report.luckyNumber}
-              </span>
-            </div>
-            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center">
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Lucky Color
-              </span>
-              <span className="text-lg font-semibold text-ivory mt-2">{report.luckyColor}</span>
             </div>
           </div>
 
@@ -207,6 +195,48 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
             </div>
           </div>
 
+          {/* Compatibility Checker */}
+          <CompatibilityChecker currentReport={report} onUpdateHistory={refreshLists} />
+
+          {/* Email Actions */}
+          <EmailReportForm report={report} />
+        </div>
+
+        {/* Right Column: Lucky Color & Number, Birthstone, Dashboard Summary, History/Saved */}
+        <div className="space-y-6">
+          {/* Lucky Color & Number Grid */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Lucky Number
+              </span>
+              <span className="text-4xl font-display font-bold gold-gradient mt-1">
+                {report.luckyNumber}
+              </span>
+            </div>
+            <div className="glass rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+              <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Lucky Color
+              </span>
+              <span className="text-lg font-semibold text-ivory mt-2">{report.luckyColor}</span>
+            </div>
+          </div>
+
+          {/* Birthstone Card */}
+          <div className="glass rounded-2xl p-5 sm:p-6 space-y-3">
+            <h3 className="font-display text-xl text-gold">
+              Your Birthstone: {report.birthstone.name}
+            </h3>
+            <div className="space-y-2 text-sm leading-relaxed">
+              <p>
+                <strong>Traditional Meaning:</strong> {report.birthstone.meaning}
+              </p>
+              <p className="text-xs text-foreground/80 italic">
+                <strong>Benefits:</strong> {report.birthstone.benefits}
+              </p>
+            </div>
+          </div>
+
           {/* Dashboard Quick Stats Card */}
           <div className="glass rounded-2xl p-5 sm:p-6 space-y-3">
             <h3 className="font-display text-lg text-gold">Dashboard Summary</h3>
@@ -217,7 +247,10 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
               </div>
               <div className="space-y-1">
                 <div className="text-muted-foreground text-[10px] uppercase">Birth Date</div>
-                <div className="text-ivory font-medium">{report.profile.birthDate}</div>
+                <div className="text-ivory font-medium">
+                  {report.profile.birthDate}
+                  {report.profile.birthTime ? ` (${report.profile.birthTime})` : ""}
+                </div>
               </div>
               <div className="space-y-1 pt-2 border-t border-border">
                 <div className="text-muted-foreground text-[10px] uppercase">Reading History</div>
@@ -255,39 +288,15 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Birthstone, Compatibility, History, Email, Saved */}
-        <div className="space-y-6">
-          {/* Birthstone Card */}
-          <div className="glass rounded-2xl p-5 sm:p-6 space-y-3">
-            <h3 className="font-display text-xl text-gold">
-              Your Birthstone: {report.birthstone.name}
-            </h3>
-            <div className="space-y-2 text-sm leading-relaxed">
-              <p>
-                <strong>Traditional Meaning:</strong> {report.birthstone.meaning}
-              </p>
-              <p className="text-xs text-foreground/80 italic">
-                <strong>Benefits:</strong> {report.birthstone.benefits}
-              </p>
-            </div>
-          </div>
-
-          {/* Compatibility Checker Card */}
-          <CompatibilityChecker currentReport={report} onUpdateHistory={refreshLists} />
-
-          {/* Email Form Card */}
-          <EmailReportForm report={report} />
-
-          {/* Saved Reports Card */}
+          {/* Saved Reports Panel */}
           <SavedReportsPanel
             savedReports={savedReports}
             onSelectReport={handleSelectReportFromLists}
             onDeleteReport={handleDeletedSaved}
           />
 
-          {/* History Panel Card */}
+          {/* History Panel */}
           <HistoryPanel
             history={history}
             onSelectReport={handleSelectReportFromLists}
@@ -297,8 +306,22 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
       </div>
 
       {/* Astrology Blog Section (Stretching across bottom) */}
-      <section className="pt-2">
+      <section className="pt-6 border-t border-border/20">
         <BlogSection />
+      </section>
+
+      {/* Honesty/About Section (Subtle MVP disclosure) */}
+      <section className="pt-6 border-t border-border/20">
+        <div className="glass rounded-2xl p-5 sm:p-6 text-center max-w-2xl mx-auto space-y-2.5 border border-border/40 bg-[oklch(1_0_0/0.01)]">
+          <h4 className="font-display text-xs uppercase tracking-widest text-gold/80">
+            About Your Reading
+          </h4>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            This reading is generated from your zodiac sign and today’s date. Your profile and saved
+            reports stay locally in this browser. Email delivery only sends the current report when
+            requested. This is for self-reflection and entertainment, not professional advice.
+          </p>
+        </div>
       </section>
     </div>
   );

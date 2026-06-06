@@ -1,11 +1,11 @@
 // Moon phase helper based on synodic month from a known new moon.
 // Reference new moon: 2000-01-06 18:14 UTC. Synodic period: 29.530588853 days.
 
-import { useId } from "react";
+import { useId, useState, useEffect } from "react";
 
 const DEFAULT_DISPLAY_DATE = new Date(Date.UTC(2024, 8, 18, 12, 0, 0));
 
-export function getMoonPhase(date: Date = new Date()) {
+function getMoonPhase(date: Date = new Date()) {
   const SYNODIC = 29.530588853;
   const refNewMoon = Date.UTC(2000, 0, 6, 18, 14, 0);
   const days = (date.getTime() - refNewMoon) / 86400000;
@@ -27,8 +27,19 @@ export function getMoonPhase(date: Date = new Date()) {
   return { phase, name: names[idx], illumination };
 }
 
-export function Moon({ size = 80, date = DEFAULT_DISPLAY_DATE }: { size?: number; date?: Date }) {
-  const { phase, name, illumination } = getMoonPhase(date);
+export function Moon({ size = 80, date }: { size?: number; date?: Date }) {
+  const [resolvedDate, setResolvedDate] = useState<Date | undefined>(date);
+
+  useEffect(() => {
+    if (date) {
+      setResolvedDate(date);
+    } else {
+      setResolvedDate(new Date());
+    }
+  }, [date]);
+
+  const displayDate = resolvedDate || DEFAULT_DISPLAY_DATE;
+  const { phase, name, illumination } = getMoonPhase(displayDate);
   const uid = useId();
   const litId = `moon-lit-${uid}`;
   const glowId = `moon-glow-${uid}`;

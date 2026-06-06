@@ -4,6 +4,7 @@ import { parseBirthDateInput, MIN_BIRTH_DATE, toDateInputValue } from "@/lib/bir
 import { getZodiacSign } from "@/lib/zodiac";
 import { addOrUpdateHistoryEntry } from "@/lib/storage";
 import { type CelestiaReport } from "@/lib/report";
+import { CustomDatePicker } from "./CustomDatePicker";
 
 type CompatibilityCheckerProps = {
   currentReport: CelestiaReport;
@@ -20,6 +21,8 @@ export function CompatibilityChecker({
   const [result, setResult] = useState<{
     lovePercent: number;
     friendshipPercent: number;
+    strength: string;
+    friction: string;
     advice: string;
     partnerSign: string;
     partnerSymbol: string;
@@ -28,6 +31,31 @@ export function CompatibilityChecker({
   useEffect(() => {
     setMaxBirthDate(toDateInputValue(new Date()));
   }, []);
+
+  useEffect(() => {
+    if (currentReport.compatibility) {
+      setPartnerDob(currentReport.compatibility.secondBirthDate);
+      const validation = parseBirthDateInput(currentReport.compatibility.secondBirthDate);
+      const vCurrent = parseBirthDateInput(currentReport.profile.birthDate);
+      if (validation.ok && vCurrent.ok) {
+        const partnerSign = getZodiacSign(validation.month, validation.day);
+        const userSignObj = getZodiacSign(vCurrent.month, vCurrent.day);
+        const compatibility = calculateCompatibility(userSignObj, partnerSign);
+        setResult({
+          lovePercent: compatibility.lovePercent,
+          friendshipPercent: compatibility.friendshipPercent,
+          strength: compatibility.strength,
+          friction: compatibility.friction,
+          advice: compatibility.advice,
+          partnerSign: partnerSign.name,
+          partnerSymbol: partnerSign.symbol,
+        });
+      }
+    } else {
+      setPartnerDob("");
+      setResult(null);
+    }
+  }, [currentReport]);
 
   function handleCheck(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +79,8 @@ export function CompatibilityChecker({
     const matchResult = {
       lovePercent: compatibility.lovePercent,
       friendshipPercent: compatibility.friendshipPercent,
+      strength: compatibility.strength,
+      friction: compatibility.friction,
       advice: compatibility.advice,
       partnerSign: partnerSign.name,
       partnerSymbol: partnerSign.symbol,
@@ -66,6 +96,8 @@ export function CompatibilityChecker({
         secondSign: partnerSign.name,
         lovePercent: compatibility.lovePercent,
         friendshipPercent: compatibility.friendshipPercent,
+        strength: compatibility.strength,
+        friction: compatibility.friction,
         advice: compatibility.advice,
       },
     };
@@ -91,19 +123,15 @@ export function CompatibilityChecker({
           >
             Their Date of Birth
           </label>
-          <input
+          <CustomDatePicker
             id="partner-dob"
-            type="date"
             value={partnerDob}
             min={MIN_BIRTH_DATE}
             max={maxBirthDate || undefined}
-            aria-required="true"
-            suppressHydrationWarning
-            onChange={(e) => {
-              setPartnerDob(e.target.value);
+            onChange={(val) => {
+              setPartnerDob(val);
               if (error) setError(null);
             }}
-            className="mt-1.5 w-full rounded-xl border border-border bg-[oklch(1_0_0/0.04)] px-3 py-2 text-sm text-ivory outline-none transition-colors hover:bg-[oklch(1_0_0/0.06)] focus:border-[var(--gold)]/60 focus-visible:ring-2 focus-visible:ring-[var(--gold)]/30"
           />
         </div>
 
@@ -156,11 +184,25 @@ export function CompatibilityChecker({
             </div>
           </div>
 
-          <div className="rounded-xl bg-[oklch(1_0_0/0.03)] p-3 text-xs leading-relaxed text-foreground/90 border border-border">
-            <div className="font-semibold text-gold mb-1 text-[10px] uppercase tracking-wider">
-              Relationship Advice
+          <div className="rounded-xl bg-[oklch(1_0_0/0.03)] p-3 text-xs leading-relaxed text-foreground/90 border border-border space-y-2.5">
+            <div>
+              <div className="font-semibold text-gold mb-0.5 text-[9px] uppercase tracking-wider">
+                Mutual Strength
+              </div>
+              <div>{result.strength}</div>
             </div>
-            {result.advice}
+            <div className="border-t border-border/40 pt-2">
+              <div className="font-semibold text-rose-400 mb-0.5 text-[9px] uppercase tracking-wider">
+                Potential Friction
+              </div>
+              <div>{result.friction}</div>
+            </div>
+            <div className="border-t border-border/40 pt-2">
+              <div className="font-semibold text-sky-400 mb-0.5 text-[9px] uppercase tracking-wider">
+                Relationship Advice
+              </div>
+              <div>{result.advice}</div>
+            </div>
           </div>
         </div>
       )}

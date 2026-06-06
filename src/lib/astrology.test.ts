@@ -10,7 +10,6 @@ import { ZODIAC } from "./zodiac.ts";
 describe("getDailyHoroscope", () => {
   test("returns stable text for the same sign and date", () => {
     const date = new Date(2026, 5, 5);
-
     assert.equal(getDailyHoroscope("Aries", date), getDailyHoroscope("Aries", date));
   });
 
@@ -20,6 +19,58 @@ describe("getDailyHoroscope", () => {
       getDailyHoroscope("Libra", new Date(2026, 5, 6)),
     );
   });
+
+  test("returns non-empty output", () => {
+    const output = getDailyHoroscope("Taurus", new Date(2026, 5, 5));
+    assert.ok(output);
+    assert.ok(output.trim().length > 20);
+  });
+
+  test("does not contain banned overclaiming words", () => {
+    const banned = [
+      "perfect",
+      "accurate",
+      "real astrology",
+      "daily email",
+      "admin",
+      "login",
+      "AI horoscope",
+      "guaranteed",
+      "prediction",
+      "health",
+      "financial",
+      "fate",
+      "future",
+    ];
+    // Check across multiple signs and dates to ensure coverage
+    const signs = [
+      "Aries",
+      "Taurus",
+      "Gemini",
+      "Cancer",
+      "Leo",
+      "Virgo",
+      "Libra",
+      "Scorpio",
+      "Sagittarius",
+      "Capricorn",
+      "Aquarius",
+      "Pisces",
+    ];
+    const dates = [new Date(2026, 5, 5), new Date(2026, 11, 25)];
+    for (const sign of signs) {
+      for (const date of dates) {
+        const text = getDailyHoroscope(sign, date).toLowerCase();
+        for (const word of banned) {
+          assert.equal(
+            text.includes(word),
+            false,
+            `Horoscope for ${sign} on ${date.toISOString()} contains banned word: "${word}"`,
+          );
+        }
+      }
+    }
+  });
 });
 
 describe("calculateCompatibility", () => {
@@ -28,9 +79,43 @@ describe("calculateCompatibility", () => {
 
     assert.equal(result.firstSign, "Aries");
     assert.equal(result.secondSign, "Gemini");
-    assert.equal(result.lovePercent, 91);
-    assert.equal(result.friendshipPercent, 87);
-    assert.match(result.advice, /Fire and Air/);
+    // Under revised system: Air + Fire is base 86/84. No modality clash (+3/+2). Result = 89/86.
+    assert.equal(result.lovePercent, 89);
+    assert.equal(result.friendshipPercent, 86);
+    assert.match(result.advice, /conceptual discussions/);
+  });
+
+  test("scores stay within valid range (20 to 99)", () => {
+    const signs = Object.values(ZODIAC);
+    for (const s1 of signs) {
+      for (const s2 of signs) {
+        const result = calculateCompatibility(s1, s2);
+        assert.ok(result.lovePercent >= 20 && result.lovePercent <= 99);
+        assert.ok(result.friendshipPercent >= 20 && result.friendshipPercent <= 99);
+      }
+    }
+  });
+
+  test("same inputs are deterministic", () => {
+    const r1 = calculateCompatibility(ZODIAC.leo, ZODIAC.scorpio);
+    const r2 = calculateCompatibility(ZODIAC.leo, ZODIAC.scorpio);
+    assert.deepEqual(r1, r2);
+  });
+
+  test("same sign compatibility is handled", () => {
+    const result = calculateCompatibility(ZODIAC.virgo, ZODIAC.virgo);
+    assert.equal(result.lovePercent, 72);
+    assert.equal(result.friendshipPercent, 78);
+    assert.match(result.strength, /Shared core identity/);
+    assert.match(result.friction, /ego standoffs/);
+    assert.match(result.advice, /Give each other space/);
+  });
+
+  test("different signs produce meaningful text", () => {
+    const result = calculateCompatibility(ZODIAC.taurus, ZODIAC.scorpio);
+    assert.ok(result.strength);
+    assert.ok(result.friction);
+    assert.ok(result.advice);
   });
 
   test("validates birth dates before creating a compatibility report", () => {

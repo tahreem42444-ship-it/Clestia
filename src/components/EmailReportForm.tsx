@@ -56,9 +56,24 @@ export function EmailReportForm({ report }: EmailReportFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
+        let friendlyMessage = "Failed to send email. Your report remains saved in this browser.";
+        if (data.code === "EMAIL_NOT_CONFIGURED") {
+          friendlyMessage =
+            "Email is not configured for this deployment yet. Your report is still saved locally.";
+        } else if (data.code === "INVALID_EMAIL") {
+          friendlyMessage = "Please enter a valid email address.";
+        } else if (data.code === "INVALID_REPORT") {
+          friendlyMessage = "The reading report data is incomplete or invalid. Try refreshing.";
+        } else if (data.code === "EMAIL_SEND_FAILED") {
+          friendlyMessage =
+            "Email delivery failed. Your report is still saved locally in your browser.";
+        } else if (data.error) {
+          friendlyMessage = data.error;
+        }
+
         setStatus({
           type: "error",
-          message: data.error || "Failed to send email. Please check your configuration.",
+          message: friendlyMessage,
         });
       } else {
         setStatus({ type: "success", message: `Successfully emailed report to ${emailTrimmed}!` });
@@ -67,7 +82,7 @@ export function EmailReportForm({ report }: EmailReportFormProps) {
     } catch (e) {
       setStatus({
         type: "error",
-        message: "A network error occurred while sending the email. Please try again.",
+        message: "A network error occurred. Your report remains saved in this browser.",
       });
     } finally {
       setSending(false);

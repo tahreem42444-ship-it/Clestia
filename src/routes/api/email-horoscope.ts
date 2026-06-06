@@ -21,18 +21,24 @@ export const Route = createFileRoute("/api/email-horoscope")({
 
           // 1. Validate email format
           if (!to || typeof to !== "string" || !to.includes("@")) {
-            return new Response(JSON.stringify({ error: "Invalid email address." }), {
-              status: 400,
-              headers: { "Content-Type": "application/json" },
-            });
+            return new Response(
+              JSON.stringify({ code: "INVALID_EMAIL", error: "Invalid email address." }),
+              {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
           }
 
           // 2. Validate required report fields
           if (!name || typeof name !== "string" || name.trim().length < 2) {
-            return new Response(JSON.stringify({ error: "Invalid name." }), {
-              status: 400,
-              headers: { "Content-Type": "application/json" },
-            });
+            return new Response(
+              JSON.stringify({ code: "INVALID_REPORT", error: "Invalid name." }),
+              {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
           }
 
           if (
@@ -48,7 +54,10 @@ export const Route = createFileRoute("/api/email-horoscope")({
             !report.birthstoneBenefits
           ) {
             return new Response(
-              JSON.stringify({ error: "Invalid report data. Required fields are missing." }),
+              JSON.stringify({
+                code: "INVALID_REPORT",
+                error: "Invalid report data. Required fields are missing.",
+              }),
               { status: 400, headers: { "Content-Type": "application/json" } },
             );
           }
@@ -61,7 +70,8 @@ export const Route = createFileRoute("/api/email-horoscope")({
             console.warn("RESEND_API_KEY is not configured.");
             return new Response(
               JSON.stringify({
-                error: "Email service is not configured. (RESEND_API_KEY is missing)",
+                code: "EMAIL_NOT_CONFIGURED",
+                error: "Email service is not configured on the server.",
               }),
               { status: 503, headers: { "Content-Type": "application/json" } },
             );
@@ -76,7 +86,7 @@ export const Route = createFileRoute("/api/email-horoscope")({
             ? `\nCompatibility Result:\n${report.compatibilitySummary}\n`
             : "";
           const compatibilityHtml = report.compatibilitySummary
-            ? `<h3>Compatibility Result</h3><p>${report.compatibilitySummary}</p>`
+            ? `<h3>Compatibility Result</h3><p>${escHtml(report.compatibilitySummary).replace(/\n/g, "<br />")}</p>`
             : "";
 
           const textContent = `
@@ -143,10 +153,13 @@ This reading is for entertainment and self-reflection only. Thank you for using 
 
           if (data.error) {
             console.error("Resend API returned an error:", data.error);
-            return new Response(JSON.stringify({ error: data.error.message }), {
-              status: 500,
-              headers: { "Content-Type": "application/json" },
-            });
+            return new Response(
+              JSON.stringify({ code: "EMAIL_SEND_FAILED", error: "Failed to send email." }),
+              {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+              },
+            );
           }
 
           return new Response(JSON.stringify({ success: true, id: data.data?.id }), {
@@ -155,11 +168,13 @@ This reading is for entertainment and self-reflection only. Thank you for using 
           });
         } catch (e: unknown) {
           console.error("Failed to process email request:", e);
-          const errorMessage = e instanceof Error ? e.message : "Internal server error";
-          return new Response(JSON.stringify({ error: errorMessage }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" },
-          });
+          return new Response(
+            JSON.stringify({ code: "EMAIL_SEND_FAILED", error: "Internal server error." }),
+            {
+              status: 500,
+              headers: { "Content-Type": "application/json" },
+            },
+          );
         }
       },
     },

@@ -8,6 +8,7 @@ import {
 import { getProfile, saveProfile } from "@/lib/storage";
 import { type CelestiaProfile } from "@/lib/report";
 import { ConstellationRing } from "./ConstellationRing";
+import { CustomDateTimePicker } from "./CustomDateTimePicker";
 
 type ProfileFormProps = {
   onSubmitSuccess: (profile: CelestiaProfile) => void;
@@ -16,6 +17,7 @@ type ProfileFormProps = {
 export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
+  const [birthTime, setBirthTime] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
   const [maxBirthDate, setMaxBirthDate] = useState("");
 
@@ -25,6 +27,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
     if (existing) {
       setName(existing.name);
       setDob(existing.birthDate);
+      setBirthTime(existing.birthTime);
     }
   }, []);
 
@@ -42,13 +45,12 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
       return;
     }
 
-    const dateControl = e.currentTarget.elements.namedItem("date-of-birth") as HTMLInputElement;
-    if (!dob && dateControl.validity.badInput) {
+    if (!dob) {
       setError(INVALID_DATE_ERROR);
       return;
     }
 
-    const validation = parseBirthDateInput(dateControl.value);
+    const validation = parseBirthDateInput(dob);
     if (!validation.ok) {
       setError(validation.error);
       return;
@@ -57,6 +59,7 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
     const newProfile: CelestiaProfile = {
       name: trimmedName,
       birthDate: validation.value,
+      birthTime,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -107,32 +110,21 @@ export function ProfileForm({ onSubmitSuccess }: ProfileFormProps) {
               />
             </div>
 
-            <div>
-              <label
-                htmlFor="dob"
-                className="block text-[10px] uppercase tracking-widest text-muted-foreground"
-              >
-                Date of birth
-              </label>
-              <input
-                id="dob"
-                name="date-of-birth"
-                type="date"
-                value={dob}
-                min={MIN_BIRTH_DATE}
-                max={maxBirthDate || undefined}
-                aria-required="true"
-                aria-invalid={error ? "true" : "false"}
-                aria-describedby={error ? "dob-help dob-error" : "dob-help"}
-                suppressHydrationWarning
-                onChange={(event) => {
-                  setDob(event.target.value);
-                  if (error) setError(null);
-                }}
-                style={{ caretColor: "transparent" }}
-                className="mt-1.5 w-full rounded-xl border border-border bg-[oklch(1_0_0/0.04)] px-3 py-2.5 text-sm text-ivory outline-none transition-colors hover:bg-[oklch(1_0_0/0.06)] focus:border-[var(--gold)]/60 focus-visible:ring-2 focus-visible:ring-[var(--gold)]/30"
-              />
-            </div>
+            <CustomDateTimePicker
+              id="dob"
+              dateValue={dob}
+              onChangeDate={(value) => {
+                setDob(value);
+                if (error) setError(null);
+              }}
+              timeValue={birthTime}
+              onChangeTime={(value) => {
+                setBirthTime(value);
+                if (error) setError(null);
+              }}
+              minDate={MIN_BIRTH_DATE}
+              maxDate={maxBirthDate || undefined}
+            />
           </div>
 
           {error && (

@@ -1,6 +1,50 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { BLOG_POSTS, type BlogPost } from "@/lib/blog.ts";
 import { BookOpen, X } from "lucide-react";
+
+function parseMarkdownText(text: string): ReactNode {
+  // Split by bold (**...**) and italic (*...*) markers.
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
+}
+
+function renderMarkdownParagraph(para: string, i: number): ReactNode {
+  const lines = para.split("\n");
+  const isBulletList = lines.every((line) => line.trim().startsWith("-"));
+  const isNumberedList = lines.every((line) => /^\d+\.\s/.test(line.trim()));
+
+  if (isBulletList) {
+    return (
+      <ul key={i} className="list-disc pl-5 space-y-2 text-xs sm:text-sm">
+        {lines.map((line, idx) => {
+          const cleanLine = line.trim().replace(/^-\s*/, "");
+          return <li key={idx}>{parseMarkdownText(cleanLine)}</li>;
+        })}
+      </ul>
+    );
+  }
+
+  if (isNumberedList) {
+    return (
+      <ol key={i} className="list-decimal pl-5 space-y-2 text-xs sm:text-sm">
+        {lines.map((line, idx) => {
+          const cleanLine = line.trim().replace(/^\d+\.\s*/, "");
+          return <li key={idx}>{parseMarkdownText(cleanLine)}</li>;
+        })}
+      </ol>
+    );
+  }
+
+  return <p key={i}>{parseMarkdownText(para)}</p>;
+}
 
 export function BlogSection() {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
@@ -73,30 +117,9 @@ export function BlogSection() {
             </div>
 
             <div className="overflow-y-auto p-5 sm:p-6 text-sm text-foreground/90 space-y-4 leading-relaxed font-sans scroll-smooth custom-scrollbar">
-              {selectedPost.content.split("\n\n").map((para, i) => {
-                if (para.startsWith("- **")) {
-                  // Render as bullet points
-                  return (
-                    <ul key={i} className="list-disc pl-5 space-y-2 text-xs sm:text-sm">
-                      {para.split("\n").map((item, idx) => {
-                        const cleanItem = item.replace("- ", "");
-                        const strongPart = cleanItem.match(/\*\*(.*?)\*\*/);
-                        if (strongPart) {
-                          const parts = cleanItem.split(strongPart[0]);
-                          return (
-                            <li key={idx}>
-                              <strong>{strongPart[1]}</strong>
-                              {parts[1]}
-                            </li>
-                          );
-                        }
-                        return <li key={idx}>{cleanItem}</li>;
-                      })}
-                    </ul>
-                  );
-                }
-                return <p key={i}>{para}</p>;
-              })}
+              {selectedPost.content
+                .split("\n\n")
+                .map((para, i) => renderMarkdownParagraph(para, i))}
             </div>
 
             <div className="border-t border-border p-4 bg-[oklch(1_0_0/0.02)] flex justify-end">

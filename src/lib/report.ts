@@ -7,6 +7,7 @@ import { parseBirthDateInput } from "./birth-date.ts";
 export type CelestiaProfile = {
   name: string;
   birthDate: string;
+  birthTime?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -39,6 +40,8 @@ export type CelestiaReport = {
     secondSign: string;
     lovePercent: number;
     friendshipPercent: number;
+    strength?: string;
+    friction?: string;
     advice: string;
   };
 };
