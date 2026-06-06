@@ -25,6 +25,7 @@ export const Route = createFileRoute("/api/astro-report")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        let generateFallbackChart: (() => BirthChartReport) | null = null;
         try {
           const body = await request.json();
           const { name, birthDate, birthTime, birthLocation } = body;
@@ -79,6 +80,8 @@ export const Route = createFileRoute("/api/astro-report")({
           const apiKey = process.env.FREE_ASTRO_API_KEY;
 
           let dateObj = new Date(birthDate + "T12:00:00");
+          let hours = 12;
+          let minutes = 0;
           if (birthTime) {
             const match = String(birthTime).match(/(\d+):(\d+)\s*(AM|PM)?/i);
             if (match) {
@@ -89,13 +92,15 @@ export const Route = createFileRoute("/api/astro-report")({
                 if (ampm.toUpperCase() === "PM" && h < 12) h += 12;
                 if (ampm.toUpperCase() === "AM" && h === 12) h = 0;
               }
+              hours = h;
+              minutes = m;
               dateObj = new Date(
                 birthDate + `T${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:00`,
               );
             }
           }
 
-          const generateFallbackChart = (): BirthChartReport => {
+          generateFallbackChart = (): BirthChartReport => {
             const planets = getPlanetPositions(dateObj);
             const moonPhase = getMoonPhaseInfo(dateObj);
             const sunSign = planets.find((p) => p.planet === "Sun")?.sign;
@@ -121,22 +126,6 @@ export const Route = createFileRoute("/api/astro-report")({
               }),
               { status: 200, headers: { "Content-Type": "application/json" } },
             );
-          }
-
-          // 3. Parse birth time
-          let hours = 12;
-          let minutes = 0;
-          if (birthTime) {
-            const match = String(birthTime).match(/(\d+):(\d+)\s*(AM|PM)?/i);
-            if (match) {
-              hours = parseInt(match[1], 10);
-              minutes = parseInt(match[2], 10);
-              const ampm = match[3];
-              if (ampm) {
-                if (ampm.toUpperCase() === "PM" && hours < 12) hours += 12;
-                if (ampm.toUpperCase() === "AM" && hours === 12) hours = 0;
-              }
-            }
           }
 
           const [yearStr, monthStr, dayStr] = birthDate.split("-");
@@ -261,44 +250,20 @@ export const Route = createFileRoute("/api/astro-report")({
           console.error("Failed to generate advanced astrology report:", error);
 
           try {
-            // Attempt to recover with fallback if FreeAstroAPI failed exceptionally
-            const { getPlanetPositions, getMoonPhaseInfo } = await import("@/lib/astronomy-engine");
-            let fallbackDateObj = new Date(); // Using current time as absolute fallback fallback
-            // Trying to use provided date again
-            const body = await request
-              .clone()
-              .json()
-              .catch(() => ({}));
-            if (body.birthDate) {
-              fallbackDateObj = new Date(body.birthDate + "T12:00:00");
-              if (body.birthTime) {
-                const [h, m] = body.birthTime.split(":");
-                fallbackDateObj = new Date(
-                  body.birthDate +
-                    `T${(h || "12").padStart(2, "0")}:${(m || "00").padStart(2, "0")}:00`,
-                );
-              }
+            if (generateFallbackChart) {
+              return new Response(
+                JSON.stringify({
+                  ok: true,
+                  birthChart: generateFallbackChart(),
+                  warning: {
+                    code: "FREE_ASTRO_FAILED_USING_FALLBACK",
+                    message: "Advanced provider unavailable. Fallback chart generated locally.",
+                  },
+                }),
+                { status: 200, headers: { "Content-Type": "application/json" } },
+              );
             }
-            const planets = getPlanetPositions(fallbackDateObj);
-            const moonPhase = getMoonPhaseInfo(fallbackDateObj);
-
-            return new Response(
-              JSON.stringify({
-                ok: true,
-                birthChart: {
-                  source: "astronomy-engine-lite",
-                  planets,
-                  sunSign: planets.find((p) => p.planet === "Sun")?.sign,
-                  moonSign: planets.find((p) => p.planet === "Moon")?.sign,
-                  moonPhase,
-                },
-                warning: {
-                  code: "FREE_ASTRO_FAILED_USING_FALLBACK",
-                  message: "Advanced provider unavailable. Fallback chart generated locally.",
-                },
-              }),
-              { status: 200, headers: { "Content-Type": "application/json" } },
-            );
+            throw error;
           } catch (fallbackError) {
             console.error("Fallback generation also failed:", fallbackError);
             return new Response(

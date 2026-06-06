@@ -20,7 +20,8 @@ export const Route = createFileRoute("/api/email-horoscope")({
           const { to, name, report } = body;
 
           // 1. Validate email format
-          if (!to || typeof to !== "string" || !to.includes("@")) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!to || typeof to !== "string" || !emailRegex.test(to)) {
             return new Response(
               JSON.stringify({ code: "INVALID_EMAIL", error: "Invalid email address." }),
               {
