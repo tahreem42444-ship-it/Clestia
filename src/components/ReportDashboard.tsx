@@ -240,7 +240,12 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
           </div>
         </div>
 
-        {/* CompatibilityChecker moved to bottom utilities */}
+        {/* Zodiac Compatibility */}
+        <CompatibilityChecker
+          currentReport={report}
+          onUpdateHistory={refreshLists}
+          onUpdateReport={onUpdateReport}
+        />
 
         {/* 7. Birth Location and Map */}
         <div className="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-border/40">
@@ -285,15 +290,10 @@ export function ReportDashboard({ report, onBack, onUpdateReport }: ReportDashbo
 
       {/* 10. Bottom Utilities */}
       <div className="grid gap-6 md:grid-cols-2 pt-6 border-t border-border/20">
-        {/* Zodiac Compatibility */}
-        <CompatibilityChecker
-          currentReport={report}
-          onUpdateHistory={refreshLists}
-          onUpdateReport={onUpdateReport}
-        />
-
-        {/* Export PDF Report */}
-        <ExportPdfReport report={report} />
+        <div className="md:col-span-2 max-w-2xl mx-auto w-full">
+          {/* Export PDF Report */}
+          <ExportPdfReport report={report} />
+        </div>
 
         {/* Saved Reports Panel */}
         <SavedReportsPanel
