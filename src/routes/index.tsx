@@ -68,7 +68,7 @@ function Index() {
       <svg
         aria-hidden="true"
         focusable="false"
-        className="pointer-events-none absolute inset-0 h-full w-full opacity-30"
+        className="pointer-events-none absolute inset-0 h-full w-full opacity-30 no-print"
       >
         <defs>
           <linearGradient id="line" x1="0" x2="1">
@@ -93,7 +93,7 @@ function Index() {
 
       <main className="relative z-10 mx-auto flex min-h-dvh w-full max-w-4xl flex-col px-4 py-4 sm:px-6 sm:py-6">
         {/* Header */}
-        <header className="flex items-center justify-center gap-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-6">
+        <header className="flex items-center justify-center gap-2 text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-6 no-print">
           <span aria-hidden="true">✦</span>
           <span>Celestia</span>
           <span aria-hidden="true">✦</span>
@@ -109,7 +109,7 @@ function Index() {
           />
         )}
 
-        <footer className="mt-auto pb-2 pt-8">
+        <footer className="mt-auto pb-2 pt-8 no-print">
           <p className="mx-auto max-w-md text-center text-[10px] leading-relaxed text-muted-foreground/60">
             © {new Date().getFullYear()} Celestia. Readings are for entertainment and
             self-reflection only.

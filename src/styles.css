@@ -295,10 +295,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 @media print {
   /* Hide all screen elements */
-  body > *:not(.print-only),
-  #root > *:not(.print-only),
-  main > *:not(.print-only),
-  .no-print {
+  .no-print,
+  .star-field,
+  .star-field::before,
+  .star-field::after {
     display: none !important;
   }
 
